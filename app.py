@@ -9,7 +9,7 @@ def menu():
     print('        |   1   |    FIFO                    |')
     print('        +-------+----------------------------+')
     print('        |   2   |    SJF (SEM PREEMPÇÃO)     |')
-    print('        +-------+----------------------------+    [TECLE  QUALQUER OUTRO NÚMERO]')
+    print('        +-------+----------------------------+    [TECLE QUALQUER OUTRO NÚMERO PARA SAIR]')
     print('        |   3   |    SJF (COM PREEMPÇÃO)     |')
     print('        +-------+----------------------------+')
     print('        |   4   |    ALGOTITMO PRIORIDADE    |')
@@ -102,8 +102,6 @@ def fifo(processes, qt_processes):
                 boo = 1
                 count -= 1
         i +=1
-        # if qt_processes == i:
-        #     break
 
 
         timeline += 1
@@ -113,7 +111,6 @@ def fifo(processes, qt_processes):
 
 
     return processes
-
 
 
 def main():
