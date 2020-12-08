@@ -35,7 +35,7 @@ def insert_process(params):
     else:
         return 0
 
-    params['qt_processes'] = int(input('Informe a quantidade de processesos: '))
+    params['qt_processes'] = int(input('Informe a quantidade de processos: '))
 
     if params['option'] == 4:
         for i in range(int(params['qt_processes'])):
@@ -89,11 +89,10 @@ def sort_by(processes, key):     #(Fila de processos, parametro para ordenação
 
 
 def generic_escalation(processes, qt_processes, key):
-    processes = sort_by(processes, key)    #Ordena os processesos em ordem crescente de tempo de chegada
+    processes = sort_by(processes, key)    #Ordena os processesos em ordem crescente conforme parâmetro
 
-    timeline = i = boo= 0
-    while len(processes[len(processes)-1]['exec']) <= 0 and not 'out_time' in processes[len(processes)-1]['exec']:      #Enquanto a última saída de processo não for registrada
-
+    timeline = 0
+    while True:
         count = 0
         while count < len(processes):
             if processes.index(processes[count]) == 0:
@@ -103,7 +102,7 @@ def generic_escalation(processes, qt_processes, key):
                         'out_time': 0
                     })
 
-            if count > 0 and len(processes[count-1]['exec']) > 0 and processes[count-1]['exec'][0]['out_time'] > 0 and len(processes[count]['exec']) == 0: #Se existem mais que 2 processos e o anterior já está finalizado
+            if count > 0 and len(processes[count-1]['exec']) > 0 and processes[count-1]['exec'][0]['out_time'] > 0 and len(processes[count]['exec']) == 0 and processes[count]['start_time'] <= timeline: #Se existem mais que 2 processos, o anterior já está finalizado e já está na hora deste executar
                 processes[count]['exec'].append({
                     'in_time': timeline,
                     'out_time': 0
@@ -115,20 +114,19 @@ def generic_escalation(processes, qt_processes, key):
             if  processes[count]['start_time'] <= timeline and len(processes[count]['exec']) == 0: #Se processo já chegou | ainda não está executando | ainda não finalizou
                 processes[count]['waiting_time'] += 1
                
-
             count += 1
         
-            if  boo == 0 and len(processes[len(processes)-1]['exec']) <= 0 and not 'out_time' in processes[len(processes)-1]['exec'] > 0:
-                boo = 1
-                count -= 1
-        i +=1
-
 
         timeline += 1
 
-        for x in range(0, len(processes)):
-            processes[x]['turnaround'] = processes[x]['waiting_time'] + processes[x]['exec_time']
-
+        try:
+            if processes[len(processes)-1]['exec'][0]['out_time'] > 0:      #Se o último processo registrou saída do processador
+                for x in range(0, len(processes)):
+                    processes[x]['turnaround'] = processes[x]['waiting_time'] + processes[x]['exec_time'] #Calcule o turnaround
+                break
+        except IndexError:
+            pass
+        
 
     return processes
 

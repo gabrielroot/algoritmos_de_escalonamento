@@ -1,29 +1,26 @@
 #Visualização da estrutura de uma sequência de processos
 
 params = {
-    'option': -1,
-    'qt_process': 0,
-    'process': [{
+    'option': -1,                   #Algoritmo escolhido
+    'qt_processes': 2,              #
+    'processes': [{
         'id': 1
         'exec_time': -1,            #Tempo de execução
         'start_time': 10,           #Instante de chegada
         'waiting_time': 0,          #Total de tempo de espera
         'turnaround': 0,            #Total de execução
-        'priority':-1,
+        'priority':-1,              #Quanto menor for o valor, maior será a relevância
         'exec': [{                  #Instantes de entrada e saída do processo
             'in_time': 0,
             'out_time': 0
         }]
     },{
-    'option': -1,
-    'qt_process': 0,
-    'process': [{
         'id': 1
         'exec_time': -1,            #Tempo de execução
         'start_time': 10,           #Instante de chegada
         'waiting_time': 0,          #Total de tempo de espera
         'turnaround': 0,            #Total de execução
-        'priority':-1,
+        'priority':-1,              #Quanto menor for o valor, maior será a relevância
         'exec': [{                  #Instantes de entrada e saída do processo
             'in_time': 0,
             'out_time': 0
