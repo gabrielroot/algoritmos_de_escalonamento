@@ -37,29 +37,49 @@ def insert_process(params):
 
     params['qt_processes'] = int(input('Informe a quantidade de processesos: '))
 
-    for i in range(int(params['qt_processes'])):
-        print(f'P{i+1}:')
+    if params['option'] == 4:
+        for i in range(int(params['qt_processes'])):
+            print(f'P{i+1}:')
 
-        exec_time = int(input('    Tempo de execução: '))
-        start_time = int(input('    Instante de chegada: '))
-        print(' ')
+            priority = int(input('    Prioridade do processo: '))
+            exec_time = int(input('    Tempo de execução: '))
+            start_time = int(input('    Instante de chegada: '))
+            print(' ')
 
-        params['processes'].append({
-            'id': i+1,
-            'exec_time': exec_time,
-            'start_time': start_time,
-            'waiting_time': 0,
-            'turnaround': -1,
-            'exec': []
-        })
+            params['processes'].append({
+                'id': i+1,
+                'exec_time': exec_time,
+                'start_time': start_time,
+                'waiting_time': 0,
+                'turnaround': -1,
+                'priority': priority,
+                'exec': []
+            })
+    else:
+        for i in range(int(params['qt_processes'])):
+            print(f'P{i+1}:')
+
+            exec_time = int(input('    Tempo de execução: '))
+            start_time = int(input('    Instante de chegada: '))
+            print(' ')
+
+            params['processes'].append({
+                'id': i+1,
+                'exec_time': exec_time,
+                'start_time': start_time,
+                'waiting_time': 0,
+                'turnaround': -1,
+                'exec': []
+            })
 
     return params
 
 
-def sort_by_start_time(processes):      #Odena os processesos em ordem crescente de tempo de chegada
+def sort_by(processes, key):     #(Fila de processos, parametro para ordenação) 
+
     for i in range(1, len(processes)):
         j = i
-        while j > 0 and processes[j - 1]['start_time'] > processes[j]['start_time']:
+        while j > 0 and processes[j - 1][key] > processes[j][key]:
             tmp = processes[j]
             processes[j] = processes[j - 1]
             processes[j - 1] = tmp
@@ -68,8 +88,8 @@ def sort_by_start_time(processes):      #Odena os processesos em ordem crescente
     return processes
 
 
-def fifo(processes, qt_processes):
-    processes = sort_by_start_time(processes)
+def generic_escalation(processes, qt_processes, key):
+    processes = sort_by(processes, key)    #Ordena os processesos em ordem crescente de tempo de chegada
 
     timeline = i = boo= 0
     while len(processes[len(processes)-1]['exec']) <= 0 and not 'out_time' in processes[len(processes)-1]['exec']:      #Enquanto a última saída de processo não for registrada
@@ -122,11 +142,15 @@ def main():
 
     menu()
     params = insert_process(params)
-    sort_by_start_time(params['processes'])    
+
     if not params:
         return
     elif params['option'] == 1:
-        params['processess'] = fifo(params['processes'],params['qt_processes'])
+        params['processess'] = generic_escalation(params['processes'],params['qt_processes'], 'start_time')
+    elif params['option'] == 2:
+        params['processess'] = generic_escalation(params['processes'],params['qt_processes'], 'exec_time')
+    elif params['option'] == 4:
+        params['processess'] = generic_escalation(params['processes'],params['qt_processes'], 'priority')
 
     print(params['processes'])
 
