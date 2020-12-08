@@ -2,10 +2,11 @@ params = {
     'option': -1,
     'qt_process': 0,
     'process': [{
-        'exec_time': -1,
-        'start_time': 10,
-        'waiting_time': 0,
-        'turnaround': 0,
+        'id': 1
+        'exec_time': -1,            #Tempo de execução
+        'start_time': 10,           #Instante de chegada
+        'waiting_time': 0,          #Total de tempo de espera
+        'turnaround': 0,            #Total de execução
         'priority':-1,
         'exec': [{                  #Instantes de entrada e saída do processo
             'in_time': 0,
