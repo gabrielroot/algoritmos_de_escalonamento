@@ -71,8 +71,8 @@ def sort_by_start_time(processes):      #Odena os processesos em ordem crescente
 def fifo(processes, qt_processes):
     processes = sort_by_start_time(processes)
 
-    timeline = i = 0
-    while i < 100:      #CORRIGIR
+    timeline = i = boo= 0
+    while len(processes[len(processes)-1]['exec']) <= 0 and not 'out_time' in processes[len(processes)-1]['exec']:      #Enquanto a última saída de processo não for registrada
 
         count = 0
         while count < len(processes):
@@ -84,22 +84,23 @@ def fifo(processes, qt_processes):
                     })
 
             if count > 0 and len(processes[count-1]['exec']) > 0 and processes[count-1]['exec'][0]['out_time'] > 0 and len(processes[count]['exec']) == 0: #Se existem mais que 2 processos e o anterior já está finalizado
-                print(processes[count-1]['exec'][0]['out_time'],'Processo anterior finalizou')
                 processes[count]['exec'].append({
                     'in_time': timeline,
                     'out_time': 0
                 })
 
             if  len(processes[count]['exec']) > 0 and processes[count]['exec'][0]['in_time'] + processes[count]['exec_time'] == timeline:  #Completamente executado!
-                print(f'Tempo de inicio+tempo de execução == timeline atual {processes[count]["start_time"]} + {processes[count]["exec_time"]} = {timeline}')
                 processes[count]['exec'][0]['out_time'] = timeline
             
             if  processes[count]['start_time'] <= timeline and len(processes[count]['exec']) == 0: #Se processo já chegou | ainda não está executando | ainda não finalizou
                 processes[count]['waiting_time'] += 1
-            
-            
+               
 
             count += 1
+        
+            if  boo == 0 and len(processes[len(processes)-1]['exec']) <= 0 and not 'out_time' in processes[len(processes)-1]['exec'] > 0:
+                boo = 1
+                count -= 1
         i +=1
         # if qt_processes == i:
         #     break
