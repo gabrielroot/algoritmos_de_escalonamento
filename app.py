@@ -87,46 +87,79 @@ def sort_by(processes, key):     #(Fila de processos, parametro para ordenação
     
     return processes
 
+def sort_by_in_time(processes): 
+
+    for i in range(1, len(processes)):
+        j = i
+        while j > 0 and processes[j - 1]['exec'][0]['in_time'] > processes[j]['exec'][0]['in_time']:
+            tmp = processes[j]
+            processes[j] = processes[j - 1]
+            processes[j - 1] = tmp
+            j -= 1
+    
+    return processes
+
 
 def generic_escalation(processes, qt_processes, key):
     processes = sort_by(processes, key)    #Ordena os processesos em ordem crescente conforme parâmetro
 
     timeline = 0
+    running = False
+    exited = 0
     while True:
-        count = 0
-        while count < len(processes):
-            if processes.index(processes[count]) == 0:
-                if processes[count]['start_time'] == timeline: 
-                    processes[count]['exec'].append({ 
-                        'in_time': timeline,
-                        'out_time': 0
-                    })
-
-            if count > 0 and len(processes[count-1]['exec']) > 0 and processes[count-1]['exec'][0]['out_time'] > 0 and len(processes[count]['exec']) == 0 and processes[count]['start_time'] <= timeline: #Se existem mais que 2 processos, o anterior já está finalizado e já está na hora deste executar
-                processes[count]['exec'].append({
+        cont = 0
+        checked_until = -1
+        while cont < len(processes):
+            if not running and len(processes[cont]['exec']) == 0 and processes[cont]['start_time'] <= timeline: #Se existem mais que 2 processos, o anterior já está finalizado e já está na hora deste executar
+                processes[cont]['exec'].append({
                     'in_time': timeline,
                     'out_time': 0
                 })
+                running = True
 
-            if  len(processes[count]['exec']) > 0 and processes[count]['exec'][0]['in_time'] + processes[count]['exec_time'] == timeline:  #Completamente executado!
-                processes[count]['exec'][0]['out_time'] = timeline
+            if  len(processes[cont]['exec']) > 0 and processes[cont]['exec'][0]['out_time'] == 0 and processes[cont]['exec'][0]['in_time'] + processes[cont]['exec_time'] == timeline:  #Completamente executado!
+                processes[cont]['exec'][0]['out_time'] = timeline
+                exited += 1
+                checked_until = cont
+                cont = 0      #Para iniciar as verificações conforme a prioridade mais alta
+                running = False
+                continue
             
-            if  processes[count]['start_time'] <= timeline and len(processes[count]['exec']) == 0: #Se processo já chegou | ainda não está executando | ainda não finalizou
-                processes[count]['waiting_time'] += 1
+            if  cont > checked_until and processes[cont]['start_time'] <= timeline and len(processes[cont]['exec']) == 0: #Se processo já chegou | ainda não está executando | ainda não finalizou
+                processes[cont]['waiting_time'] += 1
                
-            count += 1
+            cont += 1
         
 
         timeline += 1
 
-        try:
-            if processes[len(processes)-1]['exec'][0]['out_time'] > 0:      #Se o último processo registrou saída do processador
-                for x in range(0, len(processes)):
-                    processes[x]['turnaround'] = processes[x]['waiting_time'] + processes[x]['exec_time'] #Calcule o turnaround
-                break
-        except IndexError:
-            pass
-        
+        if exited == qt_processes:
+            for x in range(0, len(processes)):
+                processes[x]['turnaround'] = processes[x]['waiting_time'] + processes[x]['exec_time'] #Calcule o turnaround
+            break
+
+
+    processes = sort_by_in_time(processes)  #Para saber a ordem de execução dos processos
+    
+
+    result_processes = 'RESULTADOS:\n\n   Processo         Tempo de Espera         Turnaround\n'
+    view_process = view_exec_time = view_timeline = ' '
+    for i in range(0,qt_processes):
+        view_process += f'P{processes[i]["id"]}'
+        view_exec_time += '##'
+        view_timeline += '##'
+        result_processes += f'      P{processes[i]["id"]}                  {processes[i]["waiting_time"]}                      {processes[i]["turnaround"]}\n'
+        for j in range(0,processes[i]['exec'][0]['out_time'] - processes[i]['exec'][0]['in_time']):
+            view_timeline += f'{processes[i]["id"]}'
+            view_process += '=' 
+            view_exec_time += '-'
+    
+
+    print(result_processes)
+    
+    test =input('Deseja visualizar a linha de execução? (Talvez seja necessário redimensionar o terminal) S/N: ')
+    if test == 's' or 's'.upper():
+        print(f'{view_process}\n{view_exec_time}\n{view_timeline}')
 
     return processes
 
@@ -137,7 +170,6 @@ def main():
         'qt_processes': 0,
         'processes': []
     }
-
     menu()
     params = insert_process(params)
 
@@ -149,8 +181,6 @@ def main():
         params['processess'] = generic_escalation(params['processes'],params['qt_processes'], 'exec_time')
     elif params['option'] == 4:
         params['processess'] = generic_escalation(params['processes'],params['qt_processes'], 'priority')
-
-    print(params['processes'])
 
 
 if __name__ == "__main__":
