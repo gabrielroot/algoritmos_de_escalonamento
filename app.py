@@ -100,7 +100,7 @@ def sort_by_in_time(processes):
     return processes
 
 
-def generic_escalation(processes, qt_processes, key):
+def generic_escalation(processes, qt_processes, key): #Executa os algoritmos: FIFO, SJF (SEM PREEMPÇÂO), PRIORIDADE 
     processes = sort_by(processes, key)    #Ordena os processesos em ordem crescente conforme parâmetro
 
     timeline = 0
