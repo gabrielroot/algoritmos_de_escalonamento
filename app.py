@@ -17,6 +17,242 @@ def menu():
     print('        |   5   |    ROUND ROBIN (QUANTUM)   |')
     print('        +-------+----------------------------+')
 
+def sjfCompreepcao():
+    class SJF:
+        def infoProcesso(self, quant_processo):
+            info_processos = []
+            for i in range(quant_processo):
+                aux = []
+                processo = i+1
+                print(f"P{processo}: ")
+                tempo_de_chegada = int(input(f"Instante de chegada: "))
+                tempo_de_execucao = int(input(f"Tempo de execução: "))
+                aux.extend([processo, tempo_de_chegada, tempo_de_execucao, 0, tempo_de_execucao])
+                info_processos.append(aux)
+
+            SJF.escalonarProcesso(self, info_processos)
+
+        def escalonarProcesso(self, info_processos):
+            inicio_execucao = []
+            final_execucao = []
+            tempo_inicio = 0
+            sequencia_execucao = []
+            info_processos.sort(key=lambda x: x[1])
+            while 1:
+                fila_chegou = []
+                fila_nchegou = []
+                temp = []
+                for i in range(len(info_processos)):
+                    if info_processos[i][1] <= tempo_inicio and info_processos[i][3] == 0:
+                        temp.extend([info_processos[i][0], info_processos[i][1], info_processos[i][2], info_processos[i][4]])
+                        fila_chegou.append(temp)
+                        temp = []
+                    elif info_processos[i][3] == 0:
+                        temp.extend([info_processos[i][0], info_processos[i][1], info_processos[i][2], info_processos[i][4]])
+                        fila_nchegou.append(temp)
+                        temp = []
+                if len(fila_chegou) == 0 and len(fila_nchegou) == 0:
+                    break
+                if len(fila_chegou) != 0:
+                    fila_chegou.sort(key=lambda x: x[2])
+                    inicio_execucao.append(tempo_inicio)
+                    tempo_inicio = tempo_inicio + 1
+                    tempo_final = tempo_inicio
+                    final_execucao.append(tempo_final)
+                    sequencia_execucao.append(fila_chegou[0][0])
+                    for k in range(len(info_processos)):
+                        if info_processos[k][0] == fila_chegou[0][0]:
+                            break
+                    info_processos[k][2] = info_processos[k][2] - 1
+                    if info_processos[k][2] == 0:        
+                        info_processos[k][3] = 1
+                        info_processos[k].append(tempo_final)
+                if len(fila_chegou) == 0:
+                    if tempo_inicio < fila_nchegou[0][1]:
+                        tempo_inicio = fila_nchegou[0][1]
+                    inicio_execucao.append(tempo_inicio)
+                    tempo_inicio = tempo_inicio + 1
+                    tempo_final = tempo_inicio
+                    final_execucao.append(tempo_final)
+                    sequencia_execucao.append(fila_nchegou[0][0])
+                    for k in range(len(info_processos)):
+                        if info_processos[k][0] == fila_nchegou[0][0]:
+                            break
+                    info_processos[k][2] = info_processos[k][2] - 1
+                    if info_processos[k][2] == 0:    
+                        info_processos[k][3] = 1
+                        info_processos[k].append(tempo_final)
+            tempo_turn = SJF.tTurnaround(self, info_processos)
+            tempo_espe = SJF.tempoEspera(self, info_processos)
+            SJF.imprimirDados(self, info_processos, sequencia_execucao)
+
+        def tTurnaround(self, info_processos):
+            for i in range(len(info_processos)):
+                turnaround = info_processos[i][5] - info_processos[i][1]
+                info_processos[i].append(turnaround)
+
+        def tempoEspera(self, info_processos):
+            for i in range(len(info_processos)):
+                tempo_de_espera = info_processos[i][6] - info_processos[i][4]
+                info_processos[i].append(tempo_de_espera)
+
+        def imprimirDados(self, info_processos, sequencia_execucao):
+            info_processos.sort(key=lambda x: x[0])
+            print("Processos\tTempo de chegada\tInstante de execução\tFinal do processo\tTurnaround\tTempo de espera")
+            for i in range(len(info_processos)):
+                processo_P = info_processos[i][0]
+                i_chegada = info_processos[i][1]
+                inicio = info_processos[i][4]
+                final_do_processo = info_processos[i][5]
+                turna = info_processos[i][6]
+                tempo_espera = info_processos[i][7]
+                print(f"P{processo_P}\t\t\t{i_chegada}\t\t\t{inicio}\t\t\t{final_do_processo}\t\t\t{turna}\t\t{tempo_espera}")
+            print(f"Sequência dos processos: {sequencia_execucao}")
+
+    quant_processo = int(input("Informe a quantidade de processos: "))
+    sjf = SJF()
+    sjf.infoProcesso(quant_processo)
+
+    return 0
+
+def roundRobin():
+    class RoundRobin:
+
+        def infoProcesso(self, quant_processo):
+            info_processos = []
+            for i in range(quant_processo):
+                aux = []
+                processo = i+1
+                print(f"P{processo}")
+                tempo_de_chegada = int(input(f"Instante de chegada: "))
+                tempo_de_execucao = int(input(f"Tempo de execução: "))
+                aux.extend([processo, tempo_de_chegada, tempo_de_execucao, 0, tempo_de_execucao])
+                info_processos.append(aux)
+            tempo_quantum = int(input("Digite o quantum: "))
+            RoundRobin.escalonarProcesso(self, info_processos, tempo_quantum)
+
+        def escalonarProcesso(self, info_processos, tempo_quantum):
+            inicio_execucao = []
+            final_execucao = []
+            sequencia_execucao = []
+            fila_chegou = []
+            tempo_inicio = 0
+            info_processos.sort(key=lambda x: x[1])
+            while 1:
+                fila_nchegou = []
+                temp = []
+                for i in range(len(info_processos)):
+                    if info_processos[i][1] <= tempo_inicio and info_processos[i][3] == 0:
+                        present = 0
+                        if len(fila_chegou) != 0:
+                            for k in range(len(fila_chegou)):
+                                if info_processos[i][0] == fila_chegou[k][0]:
+                                    present = 1
+
+                        if present == 0:
+                            temp.extend([info_processos[i][0], info_processos[i][1], info_processos[i][2], info_processos[i][4]])
+                            fila_chegou.append(temp)
+                            temp = []
+
+                        if len(fila_chegou) != 0 and len(sequencia_execucao) != 0:
+                            for k in range(len(fila_chegou)):
+                                if fila_chegou[k][0] == sequencia_execucao[len(sequencia_execucao) - 1]:
+                                    fila_chegou.insert((len(fila_chegou) - 1), fila_chegou.pop(k))
+
+                    elif info_processos[i][3] == 0:
+                        temp.extend([info_processos[i][0], info_processos[i][1], info_processos[i][2], info_processos[i][4]])
+                        fila_nchegou.append(temp)
+                        temp = []
+                if len(fila_chegou) == 0 and len(fila_nchegou) == 0:
+                    break
+                if len(fila_chegou) != 0:
+                    if fila_chegou[0][2] > tempo_quantum:
+
+                        inicio_execucao.append(tempo_inicio)
+                        tempo_inicio = tempo_inicio + tempo_quantum
+                        e_time = tempo_inicio
+                        final_execucao.append(e_time)
+                        sequencia_execucao.append(fila_chegou[0][0])
+                        for j in range(len(info_processos)):
+                            if info_processos[j][0] == fila_chegou[0][0]:
+                                break
+                        info_processos[j][2] = info_processos[j][2] - tempo_quantum
+                        fila_chegou.pop(0)
+                    elif fila_chegou[0][2] <= tempo_quantum:
+
+                        inicio_execucao.append(tempo_inicio)
+                        tempo_inicio = tempo_inicio + fila_chegou[0][2]
+                        e_time = tempo_inicio
+                        final_execucao.append(e_time)
+                        sequencia_execucao.append(fila_chegou[0][0])
+                        for j in range(len(info_processos)):
+                            if info_processos[j][0] == fila_chegou[0][0]:
+                                break
+                        info_processos[j][2] = 0
+                        info_processos[j][3] = 1
+                        info_processos[j].append(e_time)
+                        fila_chegou.pop(0)
+                elif len(fila_chegou) == 0:
+                    if tempo_inicio < fila_nchegou[0][1]:
+                        tempo_inicio = fila_nchegou[0][1]
+                    if fila_nchegou[0][2] > tempo_quantum:
+
+                        inicio_execucao.append(tempo_inicio)
+                        tempo_inicio = tempo_inicio + tempo_quantum
+                        e_time = tempo_inicio
+                        final_execucao.append(e_time)
+                        sequencia_execucao.append(fila_nchegou[0][0])
+                        for j in range(len(info_processos)):
+                            if info_processos[j][0] == fila_nchegou[0][0]:
+                                break
+                        info_processos[j][2] = info_processos[j][2] - tempo_quantum
+                    elif fila_nchegou[0][2] <= tempo_quantum:
+
+                        inicio_execucao.append(tempo_inicio)
+                        tempo_inicio = tempo_inicio + fila_nchegou[0][2]
+                        e_time = tempo_inicio
+                        final_execucao.append(e_time)
+                        sequencia_execucao.append(fila_nchegou[0][0])
+                        for j in range(len(info_processos)):
+                            if info_processos[j][0] == fila_nchegou[0][0]:
+                                break
+                        info_processos[j][2] = 0
+                        info_processos[j][3] = 1
+                        info_processos[j].append(e_time)
+            tempo_turn = RoundRobin.tTurnaround(self, info_processos)
+            tempo_espe = RoundRobin.TempoEspera(self, info_processos)
+            RoundRobin.imprimirDados(self, info_processos, sequencia_execucao)
+
+        def tTurnaround(self, info_processos):
+            for i in range(len(info_processos)):
+                turnaround = info_processos[i][5] - info_processos[i][1]
+                info_processos[i].append(turnaround)
+
+        def TempoEspera(self, info_processos):
+            for i in range(len(info_processos)):
+                waiting_time = info_processos[i][6] - info_processos[i][4]
+                info_processos[i].append(waiting_time)
+
+        def imprimirDados(self, info_processos,sequencia_execucao):
+            info_processos.sort(key=lambda x: x[0])
+            print("Processos\tTempo de chegada\tInstante de execução\tFinal do processo\tTurnaround\tTempo de espera")
+            for i in range(len(info_processos)):
+                processo_P = info_processos[i][0]
+                i_chegada = info_processos[i][1]
+                inicio = info_processos[i][4]
+                final_do_processo = info_processos[i][5]
+                turna = info_processos[i][6]
+                tempo_espera = info_processos[i][7]
+                print(f"P{processo_P}\t\t\t{i_chegada}\t\t\t{inicio}\t\t\t{final_do_processo}\t\t\t{turna}\t\t{tempo_espera}")
+
+            print(f"Sequência dos processos: {sequencia_execucao}")
+    
+    quant_processo = int(input("Informe o número de processos: "))
+    rr = RoundRobin()
+    rr.infoProcesso(quant_processo)
+    
+    return 0
+
 
 def insert_process(params):
     params['option'] = int(input('Informe a opção desejada: '))
@@ -35,7 +271,17 @@ def insert_process(params):
     else:
         return 0
 
+    
+    if params['option'] == 3:
+        sjfCompreepcao()      
+        return 0
+
+    if params['option'] == 5:
+        roundRobin()
+        return 0  
+
     params['qt_processes'] = int(input('Informe a quantidade de processos: '))
+
 
     if params['option'] == 4:
         for i in range(int(params['qt_processes'])):
@@ -99,7 +345,6 @@ def sort_by_in_time(processes):
     
     return processes
 
-
 def generic_escalation(processes, qt_processes, key): #Executa os algoritmos: FIFO, SJF (SEM PREEMPÇÂO), PRIORIDADE 
     processes = sort_by(processes, key)    #Ordena os processesos em ordem crescente conforme parâmetro
 
@@ -142,13 +387,13 @@ def generic_escalation(processes, qt_processes, key): #Executa os algoritmos: FI
     processes = sort_by_in_time(processes)  #Para saber a ordem de execução dos processos
     
 
-    result_processes = 'RESULTADOS:\n\n   Processo         Tempo de Espera         Turnaround\n'
+    result_processes = 'RESULTADOS:\n\n         Processo         Tempo de Chegada         Instante de Execução         Final do Processo         Turnaround         Tempo de Espera\n'
     view_process = view_exec_time = view_timeline = ' '
     for i in range(0,qt_processes):
         view_process += f'P{processes[i]["id"]}'
-        view_exec_time += '##'
-        view_timeline += '##'
-        result_processes += f'      P{processes[i]["id"]}                  {processes[i]["waiting_time"]}                      {processes[i]["turnaround"]}\n'
+        view_exec_time += '  '
+        view_timeline += '  '
+        result_processes +=f'            P{processes[i]["id"]}                   {processes[i]["start_time"]}                           {processes[i]["exec"][0]["in_time"]}                         {processes[i]["exec"][0]["out_time"]}                       {processes[i]["turnaround"]}                   {processes[i]["waiting_time"]} \n'
         for j in range(0,processes[i]['exec'][0]['out_time'] - processes[i]['exec'][0]['in_time']):
             view_timeline += f'{processes[i]["id"]}'
             view_process += '=' 
